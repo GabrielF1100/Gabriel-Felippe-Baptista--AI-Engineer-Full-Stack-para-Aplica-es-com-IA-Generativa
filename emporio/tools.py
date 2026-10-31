@@ -141,3 +141,131 @@ def tool_consult_store_policies(question: str) -> str:
 
 
 # Definição das ferramentas no padrão OpenAI Function Calling
+TOOLS_DEFINITIONS = [
+    {
+        "type": "function",
+        "function": {
+            "name": "search_products",
+            "description": "Pesquisa instrumentos musicais no catálogo por categoria, nome, preço máximo/mínimo e disponibilidade de estoque.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "query": {
+                        "type": "string",
+                        "description": "Termo de busca como marca, modelo ou tipo (ex: 'Takamine', 'Folk', 'C40', 'Stratocaster')."
+                    },
+                    "category": {
+                        "type": "string",
+                        "description": "Categoria do instrumento (ex: 'Violões', 'Guitarras', 'Baixos', 'Baterias e Percussão', 'Teclados e Pianos', 'Ukuleles', 'Instrumentos de Sopro')."
+                    },
+                    "max_price": {
+                        "type": "number",
+                        "description": "Preço máximo em reais (BRL)."
+                    },
+                    "min_price": {
+                        "type": "number",
+                        "description": "Preço mínimo em reais (BRL)."
+                    },
+                    "only_in_stock": {
+                        "type": "boolean",
+                        "description": "Se verdadeiro, retorna apenas itens que tenham pelo menos 1 unidade em estoque."
+                    },
+                    "limit": {
+                        "type": "integer",
+                        "description": "Quantidade máxima de resultados a retornar (padrão 5)."
+                    }
+                }
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "get_product_details",
+            "description": "Consulta o preço exato, quantidade de estoque e especificações técnicas de um produto específico por ID ou nome do modelo.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "identifier": {
+                        "type": "string",
+                        "description": "ID numérico ou nome do instrumento (ex: 'Takamine GD20', '95', 'Yamaha C40')."
+                    }
+                },
+                "required": ["identifier"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "check_promotions",
+            "description": "Verifica todas as promoções e descontos especiais vigentes na loja.",
+            "parameters": {
+                "type": "object",
+                "properties": {}
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "get_order_status",
+            "description": "Consulta o status de entrega, data estimada e itens de uma compra a partir do ID do pedido ou código de rastreamento.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "order_id_or_tracking": {
+                        "type": "string",
+                        "description": "Número do pedido (ex: '1') ou código de rastreamento (ex: 'BRAB1234567BR')."
+                    }
+                },
+                "required": ["order_id_or_tracking"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "consult_store_policies",
+            "description": "Consulta as políticas oficiais da loja para responder dúvidas sobre horários, formas de pagamento, parcelamento no cartão, desconto de PIX, frete para Campo Grande e outras cidades, prazos de entrega, código de rastreamento, trocas, devolução por arrependimento (7 dias) e garantia.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "question": {
+                        "type": "string",
+                        "description": "Assunto ou dúvida a ser consultada no manual (ex: 'troca por arrependimento prazo', 'frete gratis campo grande', 'horario de sabado', 'formas de pagamento')."
+                    }
+                },
+                "required": ["question"]
+            }
+        }
+    }
+]
+
+
+def execute_tool(tool_name: str, arguments: Dict[str, Any]) -> str:
+    """
+    Executa a ferramenta solicitada com os argumentos fornecidos de forma segura.
+    """
+    try:
+        if tool_name == "search_products":
+            return tool_search_products(
+                query=arguments.get("query"),
+                category=arguments.get("category"),
+                max_price=arguments.get("max_price"),
+                min_price=arguments.get("min_price"),
+                only_in_stock=arguments.get("only_in_stock", False),
+                limit=arguments.get("limit", 5)
+            )
+        elif tool_name == "get_product_details":
+            return tool_get_product_details(arguments["identifier"])
+        elif tool_name == "check_promotions":
+            return tool_check_promotions()
+        elif tool_name == "get_order_status":
+            return tool_get_order_status(arguments["order_id_or_tracking"])
+        elif tool_name == "consult_store_policies":
+            return tool_consult_store_policies(arguments["question"])
+        else:
+            return json.dumps({"error": f"Ferramenta desconhecida: {tool_name}"})
+    except Exception as e:
+        return json.dumps({"error": f"Erro na execução da ferramenta {tool_name}: {str(e)}"})
