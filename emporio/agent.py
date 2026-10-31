@@ -242,4 +242,53 @@ class EmporioMusicAgent:
                 "Para compras acima de R$ 2.000,00 você também pode combinar formas de pagamento (ex: parte no PIX e parte no cartão)!"
             )
 
-                return "Posso te ajudar com instrumentos na Empório da Música!"
+        # 10. Consulta de status de pedido / rastreamento
+        if any(w in text for w in ["rastreio", "rastrear", "pedido", "status"]):
+            # Procurar código tipo BR... ou ID
+            match_order = re.search(r"\b(br[a-z0-9]+br|\d+)\b", text)
+            if match_order:
+                order_key = match_order.group(1).upper()
+                raw = execute_tool("get_order_status", {"order_id_or_tracking": order_key})
+                data = json.loads(raw)
+                if data.get("found"):
+                    items_desc = ", ".join([f"{it['quantity']}x {it['name']}" for it in data["items"]])
+                    return (
+                        f"Localizei o seu pedido #{data['order_id']}!\n"
+                        f"• **Status**: {data['status'].upper()}\n"
+                        f"• **Itens**: {items_desc}\n"
+                        f"• **Código de Rastreamento**: {data['tracking_code']}\n"
+                        f"• **Previsão de Entrega**: {data['estimated_delivery']}\n"
+                        f"• **Destinatário**: {data['customer_name']}\n"
+                        f"Você pode acompanhar o trajeto também no site dos Correios ou da transportadora Jadlog!"
+                    )
+            return (
+                "Para consultar o status da sua compra, por favor me informe o **número do seu pedido** ou o **código de rastreamento** (no formato BR...BR)."
+            )
+
+        # 11. Consulta de promoções
+        if any(w in text for w in ["promoção", "promocao", "promocoes", "promoções", "desconto", "queima"]):
+            raw = execute_tool("check_promotions", {})
+            data = json.loads(raw)
+            promos = data.get("promotions", [])
+            if promos:
+                lines = ["Confira as promoções ativas hoje na Empório da Música:\n"]
+                for p in promos:
+                    orig = f"R$ {p['original_price_brl']:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+                    prom = f"R$ {p['promotional_price_brl']:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+                    lines.append(f"• **{p['product_name']}** — de {orig} por **{prom}** ({p['discount_percent']}% OFF - {p['promotion_name']})")
+                lines.append("\nAproveite enquanto durarem os estoques promocionais!")
+                return "\n".join(lines)
+
+        # 12. Saudações gerais
+        if any(w in text for w in ["olá", "ola", "oi", "bom dia", "boa tarde", "boa noite"]):
+            return (
+                "Olá! Seja muito bem-vindo(a) à **Empório da Música**! 🎶\n"
+                "Aqui você encontra instrumentos das melhores marcas com as melhores condições de Campo Grande e do Brasil. "
+                "Como posso te ajudar hoje? Procura algum violão, guitarra, teclado, bateria ou gostaria de tirar alguma dúvida sobre compras e entregas?"
+            )
+
+        # Fallback padrão amigável
+        return (
+            "Com certeza posso te ajudar com isso! Sou o assistente da Empório da Música. "
+            "Você gostaria de consultar preços e modelos de instrumentos no nosso catálogo, verificar disponibilidade de estoque ou tirar dúvidas sobre prazos e entregas?"
+        )
