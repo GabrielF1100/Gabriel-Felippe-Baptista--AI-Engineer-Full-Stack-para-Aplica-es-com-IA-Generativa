@@ -176,3 +176,92 @@ def init_db(db_path=None, force_reload=False) -> sqlite3.Connection:
     return conn
 
 
+def search_products(
+    query: Optional[str] = None,
+    category_name: Optional[str] = None,
+    max_price: Optional[float] = None,
+    min_price: Optional[float] = None,
+    only_in_stock: bool = False,
+    limit: int = 10,
+    db_path=None
+) -> List[Dict[str, Any]]:
+    """
+    Pesquisa produtos no catálogo com suporte a filtros de texto, categoria, preço e estoque.
+    Retorna também se há promoção ativa para o item e o preço promocional.
+    """
+    conn = get_connection(db_path)
+    cur = conn.cursor()
+
+    sql = """
+        SELECT 
+            p.product_id,
+            p.name,
+            p.price_brl,
+            p.stock_quantity,
+            p.status,
+            p.description,
+            p.specs,
+            c.name as category_name,
+            pr.discount_percent,
+            pr.description as promotion_name,
+            pr.is_active as promotion_active
+        FROM products p
+        JOIN categories c ON p.category_id = c.category_id
+        LEFT JOIN promotions pr ON p.product_id = pr.product_id AND pr.is_active = 1
+        WHERE p.status = 'active'
+    """
+    params: List[Any] = []
+
+    if only_in_stock:
+        sql += " AND p.stock_quantity > 0"
+
+    if max_price is not None:
+        sql += " AND p.price_brl <= ?"
+        params.append(max_price)
+
+    if min_price is not None:
+        sql += " AND p.price_brl >= ?"
+        params.append(min_price)
+
+    if category_name:
+        sql += " AND (LOWER(c.name) LIKE ? OR LOWER(p.name) LIKE ?)"
+        params.extend([f"%{category_name.lower()}%", f"%{category_name.lower()}%"])
+
+    if query:
+        # Busca flexível por palavras-chave
+        keywords = query.strip().split()
+        for kw in keywords:
+            sql += " AND (LOWER(p.name) LIKE ? OR LOWER(p.description) LIKE ? OR LOWER(c.name) LIKE ?)"
+            pat = f"%{kw.lower()}%"
+            params.extend([pat, pat, pat])
+
+    sql += " ORDER BY p.price_brl ASC LIMIT ?"
+    params.append(limit)
+
+    cur.execute(sql, params)
+    rows = cur.fetchall()
+
+    results = []
+    for r in rows:
+        item = dict(r)
+        orig_price = item["price_brl"]
+        disc = item.get("discount_percent")
+        if disc and item.get("promotion_active"):
+            item["promotional_price_brl"] = round(orig_price * (1 - disc / 100.0), 2)
+            item["has_discount"] = True
+        else:
+            item["promotional_price_brl"] = None
+            item["has_discount"] = False
+
+        # Parse specs se for JSON válido
+        if item.get("specs"):
+            try:
+                item["specs_parsed"] = json.loads(item["specs"])
+            except Exception:
+                item["specs_parsed"] = {}
+        results.append(item)
+
+    conn.close()
+    return results
+
+
