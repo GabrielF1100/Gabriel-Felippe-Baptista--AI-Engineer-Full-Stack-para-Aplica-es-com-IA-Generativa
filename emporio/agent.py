@@ -71,7 +71,7 @@ class EmporioMusicAgent:
         self.history.append({"role": "assistant", "content": response_text})
         return response_text
 
-    def _respond_online_disabled(self):
+    def _respond_online(self) -> str:
         """
         Execução online utilizando OpenAI Function Calling / Tool Calling.
         """
