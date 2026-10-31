@@ -265,3 +265,57 @@ def search_products(
     return results
 
 
+def get_product_by_identifier(identifier: str, db_path=None) -> Optional[Dict[str, Any]]:
+    """
+    Busca um produto específico por ID ou por nome aproximado.
+    """
+    conn = get_connection(db_path)
+    cur = conn.cursor()
+
+    product = None
+    if identifier.strip().isdigit():
+        cur.execute("""
+            SELECT p.*, c.name as category_name, pr.discount_percent, pr.description as promotion_name, pr.is_active as promotion_active
+            FROM products p
+            JOIN categories c ON p.category_id = c.category_id
+            LEFT JOIN promotions pr ON p.product_id = pr.product_id AND pr.is_active = 1
+            WHERE p.product_id = ?
+        """, (int(identifier.strip()),))
+        row = cur.fetchone()
+        if row:
+            product = dict(row)
+
+    if not product:
+        cur.execute("""
+            SELECT p.*, c.name as category_name, pr.discount_percent, pr.description as promotion_name, pr.is_active as promotion_active
+            FROM products p
+            JOIN categories c ON p.category_id = c.category_id
+            LEFT JOIN promotions pr ON p.product_id = pr.product_id AND pr.is_active = 1
+            WHERE LOWER(p.name) LIKE ?
+            LIMIT 1
+        """, (f"%{identifier.lower().strip()}%",))
+        row = cur.fetchone()
+        if row:
+            product = dict(row)
+
+    conn.close()
+
+    if product:
+        orig = product["price_brl"]
+        disc = product.get("discount_percent")
+        if disc and product.get("promotion_active"):
+            product["promotional_price_brl"] = round(orig * (1 - disc / 100.0), 2)
+            product["has_discount"] = True
+        else:
+            product["promotional_price_brl"] = None
+            product["has_discount"] = False
+
+        if product.get("specs"):
+            try:
+                product["specs_parsed"] = json.loads(product["specs"])
+            except Exception:
+                product["specs_parsed"] = {}
+
+    return product
+
+
