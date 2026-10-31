@@ -63,8 +63,7 @@ def main():
 
     offline_mode = args.offline or (not config.OPENAI_API_KEY)
 
-    # demo flags
-    if False:
+    if args.demo:
         run_demo(offline=offline_mode)
         return
 
