@@ -211,4 +211,35 @@ class EmporioMusicAgent:
                 "Tanto nossa loja física em Campo Grande quanto nosso canal no WhatsApp atendem dentro desse expediente!"
             )
 
+        # 7. Trocas e arrependimento / devoluções
+        if any(w in text for w in ["devolver", "devolução", "devolucao", "arrependi", "arrependimento", "cancelar", "troca", "trocar"]):
+            raw = execute_tool("consult_store_policies", {"question": "arrependimento e devolução"})
+            return (
+                "Com certeza! Se a sua compra foi realizada online, você tem até **7 (sete) dias corridos** após o recebimento "
+                "para solicitar a devolução por arrependimento, com base no Código de Defesa do Consumidor.\n\n"
+                "O produto só precisa estar em perfeito estado, em sua embalagem original e com todos os acessórios e manuais. "
+                "O **frete de devolução é 100% por conta da loja** e o reembolso integral é efetuado na mesma forma de pagamento em até 10 dias úteis. "
+                "Se precisar iniciar o procedimento, basta nos informar o número do pedido ou CPF do titular da compra!"
+            )
+
+        # 8. Frete e entregas
+        if any(w in text for w in ["frete", "entrega", "sedex", "pac", "jadlog", "prazo de entrega"]):
+            return (
+                "Para a **Região Metropolitana de Campo Grande/MS**, oferecemos **FRETE GRÁTIS** para compras a partir de R$ 500,00! "
+                "Para valores inferiores, a taxa fixa é de apenas R$ 35,00, com entrega rápida de 1 a 3 dias úteis via motoboy próprio.\n\n"
+                "Para outras cidades e estados, enviamos com seguro via Correios (PAC ou SEDEX) ou transportadora Jadlog, calculado de acordo com seu CEP. "
+                "Qual a sua cidade ou CEP para eu simular para você?"
+            )
+
+        # 9. Formas de pagamento / parcelamento / PIX
+        if any(w in text for w in ["pix", "pagamento", "pagar", "parcelar", "cartão", "cartao", "boleto"]):
+            return (
+                "Aceitamos diversas formas de pagamento bem facilitadas:\n"
+                "• **PIX**: 5% de desconto à vista sobre o preço de tabela!\n"
+                "• **Cartão de Crédito**: em até 12x sem juros (parcela mínima de R$ 80 de 4x a 6x, e R$ 100 de 7x a 12x).\n"
+                "• **Boleto Bancário**: à vista (compensação em até 3 dias úteis).\n"
+                "• **Débito**: à vista em todas as bandeiras.\n"
+                "Para compras acima de R$ 2.000,00 você também pode combinar formas de pagamento (ex: parte no PIX e parte no cartão)!"
+            )
+
                 return "Posso te ajudar com instrumentos na Empório da Música!"
