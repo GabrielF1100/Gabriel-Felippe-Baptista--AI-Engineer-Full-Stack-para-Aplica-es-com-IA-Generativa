@@ -319,3 +319,77 @@ def get_product_by_identifier(identifier: str, db_path=None) -> Optional[Dict[st
     return product
 
 
+def get_order_details(order_id_or_tracking: str, db_path=None) -> Optional[Dict[str, Any]]:
+    """
+    Obtém informações completas de um pedido pelo ID ou pelo código de rastreamento.
+    """
+    conn = get_connection(db_path)
+    cur = conn.cursor()
+
+    query = order_id_or_tracking.strip()
+    sql = """
+        SELECT 
+            o.order_id,
+            o.order_date,
+            o.status,
+            o.total_brl,
+            o.payment_method,
+            o.tracking_code,
+            o.estimated_delivery,
+            o.notes,
+            c.name as customer_name,
+            c.phone as customer_phone,
+            c.email as customer_email,
+            c.city as customer_city
+        FROM orders o
+        JOIN customers c ON o.customer_id = c.customer_id
+        WHERE o.tracking_code LIKE ? OR o.order_id = ?
+    """
+    cur.execute(sql, (f"%{query}%", int(query) if query.isdigit() else -1))
+    row = cur.fetchone()
+
+    if not row:
+        conn.close()
+        return None
+
+    order_info = dict(row)
+
+    # Buscar itens do pedido
+    cur.execute("""
+        SELECT oi.quantity, p.product_id, p.name, p.price_brl
+        FROM order_items oi
+        JOIN products p ON oi.product_id = p.product_id
+        WHERE oi.order_id = ?
+    """, (order_info["order_id"],))
+    order_info["items"] = [dict(it) for it in cur.fetchall()]
+
+    conn.close()
+    return order_info
+
+
+def get_active_promotions_list(db_path=None) -> List[Dict[str, Any]]:
+    """
+    Retorna todas as promoções atualmente ativas na loja com detalhes do produto.
+    """
+    conn = get_connection(db_path)
+    cur = conn.cursor()
+
+    sql = """
+        SELECT 
+            pr.promotion_id,
+            pr.discount_percent,
+            pr.description as promotion_name,
+            p.product_id,
+            p.name as product_name,
+            p.price_brl as original_price_brl,
+            ROUND(p.price_brl * (1 - pr.discount_percent / 100.0), 2) as promotional_price_brl,
+            p.stock_quantity
+        FROM promotions pr
+        JOIN products p ON pr.product_id = p.product_id
+        WHERE pr.is_active = 1
+        ORDER BY pr.discount_percent DESC
+    """
+    cur.execute(sql)
+    rows = [dict(r) for r in cur.fetchall()]
+    conn.close()
+    return rows
