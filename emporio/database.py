@@ -92,5 +92,87 @@ def init_db(db_path=None, force_reload=False) -> sqlite3.Connection:
                         (int(r["category_id"]), r["name"], r.get("description", ""))
                     )
 
-                conn.commit()
+        # Ingestão de customers
+        if config.CUSTOMERS_CSV.exists():
+            with open(config.CUSTOMERS_CSV, encoding="utf-8") as f:
+                reader = csv.DictReader(f)
+                for r in reader:
+                    cur.execute(
+                        "INSERT INTO customers (customer_id, name, phone, email, city) VALUES (?, ?, ?, ?, ?)",
+                        (int(r["customer_id"]), r["name"], r["phone"], r["email"], r.get("city", ""))
+                    )
+
+        # Ingestão de products
+        if config.PRODUCTS_CSV.exists():
+            with open(config.PRODUCTS_CSV, encoding="utf-8") as f:
+                reader = csv.DictReader(f)
+                for r in reader:
+                    cur.execute(
+                        "INSERT INTO products (product_id, price_brl, name, category_id, description, stock_quantity, status, specs, created_at) "
+                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                        (
+                            int(r["product_id"]),
+                            float(r["price_brl"]),
+                            r["name"],
+                            int(r["category_id"]),
+                            r.get("description", ""),
+                            int(r["stock_quantity"]),
+                            r.get("status", "active"),
+                            r.get("specs", ""),
+                            r.get("created_at", "")
+                        )
+                    )
+
+        # Ingestão de promotions
+        if config.PROMOTIONS_CSV.exists():
+            with open(config.PROMOTIONS_CSV, encoding="utf-8") as f:
+                reader = csv.DictReader(f)
+                for r in reader:
+                    cur.execute(
+                        "INSERT INTO promotions (promotion_id, product_id, discount_percent, description, is_active) "
+                        "VALUES (?, ?, ?, ?, ?)",
+                        (
+                            int(r["promotion_id"]),
+                            int(r["product_id"]),
+                            float(r["discount_percent"]),
+                            r.get("description", ""),
+                            int(r.get("is_active", 0))
+                        )
+                    )
+
+        # Ingestão de orders
+        if config.ORDERS_CSV.exists():
+            with open(config.ORDERS_CSV, encoding="utf-8") as f:
+                reader = csv.DictReader(f)
+                for r in reader:
+                    cur.execute(
+                        "INSERT INTO orders (order_id, customer_id, order_date, status, total_brl, payment_method, tracking_code, estimated_delivery, notes) "
+                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                        (
+                            int(r["order_id"]),
+                            int(r["customer_id"]),
+                            r["order_date"],
+                            r["status"],
+                            float(r["total_brl"]),
+                            r.get("payment_method", ""),
+                            r.get("tracking_code", ""),
+                            r.get("estimated_delivery", ""),
+                            r.get("notes", "")
+                        )
+                    )
+
+        # Ingestão de order_items
+        if config.ORDER_ITEMS_CSV.exists():
+            with open(config.ORDER_ITEMS_CSV, encoding="utf-8") as f:
+                reader = csv.DictReader(f)
+                for r in reader:
+                    cur.execute(
+                        "INSERT INTO order_items (order_id, quantity, product_id) VALUES (?, ?, ?)",
+                        (int(r["order_id"]), int(r["quantity"]), int(r["product_id"]))
+                    )
+
+        conn.commit()
+
     return conn
+
+
