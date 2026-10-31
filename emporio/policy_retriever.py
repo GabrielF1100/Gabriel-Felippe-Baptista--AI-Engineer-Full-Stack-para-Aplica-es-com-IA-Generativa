@@ -153,5 +153,65 @@ class PolicyRetriever:
             }
         ]
 
-        def search_policies(self, query: str, top_k: int = 2):
-        return self.sections[:top_k]
+    def search_policies(self, query: str, top_k: int = 2) -> List[Dict[str, str]]:
+        """
+        Busca as seções de política mais relevantes para a dúvida do usuário.
+        Calcula pontuação por termos correspondentes e relevância contextual.
+        """
+        terms = re.findall(r"\w+", query.lower())
+        if not terms:
+            return self.sections[:top_k]
+
+        scored: List[Tuple[float, Dict[str, str]]] = []
+
+        for sec in self.sections:
+            score = 0.0
+            content_lower = sec["content"].lower()
+            title_lower = sec["title"].lower()
+
+            for t in terms:
+                if len(t) < 3:
+                    continue
+                # Palavras-chave têm peso 3.0
+                if t in sec["keywords"]:
+                    score += 3.0
+                # Ocorrências no título peso 2.0
+                if t in title_lower:
+                    score += 2.0
+                # Ocorrências no conteúdo peso 1.0
+                if t in content_lower:
+                    score += 1.0
+
+            # Boosts para cenários críticos comuns
+            if any(w in terms for w in ["devolver", "arrependi", "arrependimento", "cancelar"]) and sec["id"] == "trocas_devolucoes":
+                score += 5.0
+            if any(w in terms for w in ["frete", "entrega", "prazo", "enviar", "jadlog", "sedex", "pac"]) and sec["id"] == "frete_entregas":
+                score += 5.0
+            if any(w in terms for w in ["endereco", "onde", "localizacao", "telefone", "whatsapp", "acessorio", "corda", "palheta"]) and sec["id"] == "sobre_loja":
+                score += 5.0
+            if any(w in terms for w in ["pagar", "pagamento", "pix", "parcela", "parcelar", "cartao"]) and sec["id"] == "formas_pagamento":
+                score += 5.0
+            if any(w in terms for w in ["horario", "horas", "abre", "aberto", "fecha", "sabado", "domingo"]) and sec["id"] == "horario_funcionamento":
+                score += 5.0
+
+            if score > 0:
+                scored.append((score, sec))
+
+        # Ordenar decrescente pelo score
+        scored.sort(key=lambda x: x[0], reverse=True)
+
+        if not scored:
+            # Fallback para regras gerais de loja e atendimento
+            return [self.sections[0], self.sections[1]]
+
+        return [item[1] for item in scored[:top_k]]
+
+
+# Instância singleton para reuso rápido
+_default_retriever: Optional[PolicyRetriever] = None
+
+def get_policy_retriever() -> PolicyRetriever:
+    global _default_retriever
+    if _default_retriever is None:
+        _default_retriever = PolicyRetriever()
+    return _default_retriever
