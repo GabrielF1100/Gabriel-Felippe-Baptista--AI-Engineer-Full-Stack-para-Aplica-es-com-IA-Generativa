@@ -71,5 +71,26 @@ def init_db(db_path=None, force_reload=False) -> sqlite3.Connection:
                 "FOREIGN KEY (order_id) REFERENCES orders (order_id), "
                 "FOREIGN KEY (product_id) REFERENCES products (product_id))")
 
-        conn.commit()
+    cur.execute("SELECT COUNT(*) FROM products")
+    count = cur.fetchone()[0]
+
+    if count == 0 or force_reload:
+        cur.execute("DELETE FROM order_items")
+        cur.execute("DELETE FROM orders")
+        cur.execute("DELETE FROM promotions")
+        cur.execute("DELETE FROM products")
+        cur.execute("DELETE FROM customers")
+        cur.execute("DELETE FROM categories")
+
+        # Ingestão de categories
+        if config.CATEGORIES_CSV.exists():
+            with open(config.CATEGORIES_CSV, encoding="utf-8") as f:
+                reader = csv.DictReader(f)
+                for r in reader:
+                    cur.execute(
+                        "INSERT INTO categories (category_id, name, description) VALUES (?, ?, ?)",
+                        (int(r["category_id"]), r["name"], r.get("description", ""))
+                    )
+
+                conn.commit()
     return conn
