@@ -95,3 +95,49 @@ def tool_check_promotions() -> str:
     }, ensure_ascii=False, indent=2)
 
 
+def tool_get_order_status(order_id_or_tracking: str) -> str:
+    """
+    Consulta o andamento, status de entrega e itens de um pedido pelo ID ou código de rastreamento.
+    """
+    order = database.get_order_details(order_id_or_tracking)
+    if not order:
+        return json.dumps({
+            "error": f"Pedido ou rastreamento '{order_id_or_tracking}' não localizado no sistema.",
+            "found": False
+        }, ensure_ascii=False, indent=2)
+
+    return json.dumps({
+        "found": True,
+        "order_id": order["order_id"],
+        "status": order["status"],
+        "order_date": order["order_date"],
+        "estimated_delivery": order["estimated_delivery"],
+        "tracking_code": order["tracking_code"],
+        "payment_method": order["payment_method"],
+        "total_brl": order["total_brl"],
+        "customer_name": order["customer_name"],
+        "items": order["items"]
+    }, ensure_ascii=False, indent=2)
+
+
+def tool_consult_store_policies(question: str) -> str:
+    """
+    Consulta o manual interno de políticas e procedimentos da Empório da Música (horários, formas de pagamento, parcelamento, frete, prazos, trocas, devoluções, garantia e LGPD).
+    """
+    retriever = get_policy_retriever()
+    results = retriever.search_policies(question, top_k=2)
+
+    data = []
+    for r in results:
+        data.append({
+            "section": r["title"],
+            "guideline": r["content"]
+        })
+
+    return json.dumps({
+        "question": question,
+        "relevant_policies": data
+    }, ensure_ascii=False, indent=2)
+
+
+# Definição das ferramentas no padrão OpenAI Function Calling
