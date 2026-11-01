@@ -282,4 +282,12 @@ Na pasta [`examples/`](file:///Users/gabrielfelippebaptista/Downloads/Desafio%20
 ---
 
 ## 🔮 Limitações Conhecidas e Próximos Passos
-(Em desenvolvimento)
+
+Caso dispuséssemos de mais tempo em um roadmap evolutivo de produção, as seguintes implementações agregariam valor:
+1. **Integração com WhatsApp Cloud API**: Conectar o motor conversacional diretamente aos webhooks oficiais do WhatsApp via FastAPI para atendimento omnicanal 24/7.
+2. **Autenticação em 2 Etapas (2FA) para Pedidos**: Adicionar confirmação de CPF ou envio de token por SMS/WhatsApp antes de exibir o endereço completo de entrega do cliente, reforçando a conformidade com a LGPD.
+3. **Busca Híbrida com Vetores (Dense + Sparse Retrieval)**: Para catálogos com dezenas de milhares de SKUs, integrar uma base vetorial (como Qdrant ou ChromaDB) permitindo buscas semânticas mais abstratas (ex: *"instrumento para tocar bossa nova num luau"*).
+4. **Observabilidade e Tracing**: Integrar bibliotecas como Langfuse ou OpenTelemetry para auditar o tempo de resposta das ferramentas, custos por sessão e taxa de sucesso dos tool calls em produção.
+
+---
+
