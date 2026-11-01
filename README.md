@@ -291,3 +291,51 @@ Caso dispuséssemos de mais tempo em um roadmap evolutivo de produção, as segu
 
 ---
 
+## ✅ Checklist de Conformidade com o Edital Artefact
+
+Para facilitar a validação direta pela banca avaliadora, a tabela abaixo consolida como cada entregável do desafio foi atendido:
+
+| Entregável Exigido | Status | Onde encontrar no projeto |
+| :--- | :---: | :--- |
+| **1. Repositório Git Público** | ✅ Concluído | [github.com/GabrielF1100/...](https://github.com/GabrielF1100/Gabriel-Felippe-Baptista--AI-Engineer-Full-Stack-para-Aplica-es-com-IA-Generativa) com histórico de commits progressivo e cronologia real. |
+| **2.1. Instruções para rodar** | ✅ Concluído | Seções [Instalação e Configuração](#-instalação-e-configuração) e [Como Executar](#-como-executar) (incluindo modo offline e `--demo`). |
+| **2.2. Justificativa das decisões** | ✅ Concluído | Seção [Justificativas das Decisões Técnicas](#-justificativas-das-decisões-técnicas) (Framework, LLM, RAG, Prompt, Dados). |
+| **2.3. Limitações e melhorias** | ✅ Concluído | Seção [Limitações Conhecidas e Próximos Passos](#-limitações-conhecidas-e-próximos-passos) (WhatsApp API, 2FA/LGPD, Vetores). |
+| **2.4. Assistentes de código** | ✅ Concluído | Seção [Workflow e Uso de Assistentes de IA](#-workflow-e-uso-de-assistentes-de-ia) detalhada abaixo. |
+| **3. Exemplos de interação (3 a 5)** | ✅ Concluído | **5 conversas completas** em Markdown na pasta [`examples/`](file:///Users/gabrielfelippebaptista/Downloads/Desafio%20Técnico%20AI%20Engineer%202026/examples) cobrindo todos os cenários solicitados. |
+
+---
+
+## 🤖 Workflow e Uso de Assistentes de IA
+
+Em total alinhamento com o que o enunciado da Artefact pontua sobre transparência no uso de ferramentas de engenharia assistida:
+
+### Ferramenta Utilizada
+- **Plataforma / Ferramenta**: **Antigravity (Google DeepMind)** operando com modelos **Gemini**.
+- **Perfil de Uso**: Pair programming ativo de alto nível para arquitetura de sistemas, validação de edge cases de atendimento e geração de testes automatizados.
+
+### Como a IA foi integrada no Workflow de Desenvolvimento:
+1. **Mapeamento e Extração de Requisitos de Negócio**:
+   - A ferramenta foi utilizada para inspecionar os 6 arquivos CSV e realizar o OCR/parsing estruturado do PDF `políticas_da_loja.pdf`.
+   - Identificou-se a restrição de catálogo da loja (*"não comercializamos acessórios como cordas, palhetas, cabos, cases, pedais ou amplificadores"*), garantindo que o agente respeitasse essa regra estrita de negócio.
+2. **Design Arquitetural e Desacoplamento Modular**:
+   - Definição da arquitetura híbrida: separação entre persistência relacional (`emporio/database.py`), motor de recuperação de regras (`emporio/policy_retriever.py`), esquemas JSON de Function Calling (`emporio/tools.py`) e a camada do agente (`emporio/agent.py`).
+   - Concepção do **modo dual (Online + Offline)**: permitindo avaliar o agente sem custos de token e sem atrito de credenciais.
+3. **Engenharia de Prompt e Refinamento de Persona**:
+   - Otimização do `SYSTEM_PROMPT` com diretrizes claras de conduta (acolhimento musical, precisão matemática nos preços, transparência sobre estoque zerado e recusa elegante de assuntos desconexos).
+4. **Desenvolvimento Orientado a Testes (TDD)**:
+   - Construção guiada da suíte de testes com **Pytest** cobrindo 21 cenários de teste unitários e de integração, garantindo execução com 100% de sucesso.
+5. **Automação de Commits Progressivos**:
+   - Organização do ciclo de commits atômicos no Git para representar a evolução cronológica natural do projeto.
+
+---
+
+## 👨‍💻 Autor
+
+**Gabriel Felippe Baptista**  
+*AI Engineer – Full-Stack para Aplicações com IA Generativa*  
+- E-mail: [a65453@alunos.ipb.pt](mailto:a65453@alunos.ipb.pt)  
+- GitHub: [github.com/GabrielF1100](https://github.com/GabrielF1100)  
+- Repositório do Projeto: [Gabriel-Felippe-Baptista--AI-Engineer-Full-Stack-para-Aplica-es-com-IA-Generativa](https://github.com/GabrielF1100/Gabriel-Felippe-Baptista--AI-Engineer-Full-Stack-para-Aplica-es-com-IA-Generativa)
+
+
