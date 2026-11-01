@@ -1,14 +1,25 @@
 import csv
 import json
 import sqlite3
+import unicodedata
 from typing import Any, Dict, List, Optional
 from emporio import config
+
+
+def strip_accents(text: Optional[str]) -> str:
+    """Normaliza strings removendo acentos para buscas insensíveis a diacríticos."""
+    if not text:
+        return ""
+    normalized = unicodedata.normalize("NFD", text)
+    return "".join(c for c in normalized if unicodedata.category(c) != "Mn").lower()
 
 
 def get_connection(db_path=None) -> sqlite3.Connection:
     target = db_path or config.DB_PATH
     conn = sqlite3.connect(target)
     conn.row_factory = sqlite3.Row
+    # Registra função Python no SQLite para normalização de acentos
+    conn.create_function("STRIP_ACCENTS", 1, strip_accents)
     return conn
 
 
@@ -224,15 +235,17 @@ def search_products(
         params.append(min_price)
 
     if category_name:
-        sql += " AND (LOWER(c.name) LIKE ? OR LOWER(p.name) LIKE ?)"
-        params.extend([f"%{category_name.lower()}%", f"%{category_name.lower()}%"])
+        clean_cat = strip_accents(category_name)
+        sql += " AND (STRIP_ACCENTS(c.name) LIKE ? OR STRIP_ACCENTS(p.name) LIKE ?)"
+        params.extend([f"%{clean_cat}%", f"%{clean_cat}%"])
 
     if query:
-        # Busca flexível por palavras-chave
+        # Busca flexível por palavras-chave com suporte a termos sem acento
         keywords = query.strip().split()
         for kw in keywords:
-            sql += " AND (LOWER(p.name) LIKE ? OR LOWER(p.description) LIKE ? OR LOWER(c.name) LIKE ?)"
-            pat = f"%{kw.lower()}%"
+            clean_kw = strip_accents(kw)
+            sql += " AND (STRIP_ACCENTS(p.name) LIKE ? OR STRIP_ACCENTS(p.description) LIKE ? OR STRIP_ACCENTS(c.name) LIKE ?)"
+            pat = f"%{clean_kw}%"
             params.extend([pat, pat, pat])
 
     sql += " ORDER BY p.price_brl ASC LIMIT ?"
@@ -291,9 +304,9 @@ def get_product_by_identifier(identifier: str, db_path=None) -> Optional[Dict[st
             FROM products p
             JOIN categories c ON p.category_id = c.category_id
             LEFT JOIN promotions pr ON p.product_id = pr.product_id AND pr.is_active = 1
-            WHERE LOWER(p.name) LIKE ?
+            WHERE STRIP_ACCENTS(p.name) LIKE ?
             LIMIT 1
-        """, (f"%{identifier.lower().strip()}%",))
+        """, (f"%{strip_accents(identifier)}%",))
         row = cur.fetchone()
         if row:
             product = dict(row)
