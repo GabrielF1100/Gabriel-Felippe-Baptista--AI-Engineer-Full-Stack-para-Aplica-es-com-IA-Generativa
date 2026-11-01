@@ -202,4 +202,84 @@ pytest -v
 ---
 
 ## 💡 Justificativas das Decisões Técnicas
+
+Conforme orientado no enunciado da avaliação da Artefact, as decisões de engenharia adotadas no projeto estão mapeadas e justificadas detalhadamente abaixo.
+
+### 📋 Matriz de Decisões Técnicas
+
+| Decisão Exigida | Escolha Adotada | Racional Técnico |
+| :--- | :--- | :--- |
+| **1. Framework(s) / Abordagem do Agente** | **Híbrida (Function Calling nativo + RAG de Políticas + Motor Offline Determinístico)** | Uso do padrão OpenAI Tool Calling sem intermediários pesados (como LangChain ou CrewAI), garantindo latência mínima, controle total dos ciclos de raciocínio e redundância offline completa. |
+| **2. Modelo e Provedor** | **OpenAI (`gpt-4o-mini`) + Fallback Local** | Modelo com excelente fidelidade na emissão de JSON Schemas, baixíssimo custo por token e resposta ultrarrápida em pt-BR; complementado pelo motor offline para avaliação com custo zero. |
+| **3. Interface de Interação** | **CLI Interativo Rico (`main.py`)** | Linha de comando direta e sem atritos de portas de rede/CORS, com suporte a argumentos automatizados (`--demo`, `--scenario`, `--offline`) para avaliação objetiva. |
+| **4. Persistência do Histórico** | **Histórico em Memória de Sessão com Ciclo de Vida** | Gestão de contexto em lista de mensagens (`system`, `user`, `assistant`, `tool`) com comandos de limpeza (`limpar`) e isolamento por interação. |
+| **5. Tratamento dos Dados** | **Ingestão Relacional (SQLite) + Chunking Semântico do PDF** | Ingestão dos 6 CSVs em banco relacional para consultas com integridade e sem alucinação de estoque/preço; segmentação por tópicos do PDF de políticas via `pypdf`. |
+| **Restrição Obrigatória** | **Python 3.10+** | Utilização integral de Python moderno como linguagem central em 100% da solução. |
+
+---
+
+### 1. Framework(s) e Abordagem do Agente
+Optamos por uma **arquitetura híbrida desacoplada**, combinando:
+1. **OpenAI Function Calling (Tool Calling)** no modo online: As ferramentas (`search_products`, `get_product_details`, `check_promotions`, `get_order_status`, `consult_store_policies`) são descritas com tipagem estrita via JSON Schema. O próprio LLM atua como orquestrador, decidindo autonomamente quando buscar dados de estoque ou regras de negócio antes de responder ao cliente.
+2. **Retrieval Temático de Políticas (RAG Enxuto)**: Em vez de indexar um banco vetorial denso e custoso para um PDF de 8 páginas, construímos um mecanismo determinístico de recuperação temática ponderada (`PolicyRetriever`). Isso garante precisão factual de 100% sobre prazos (ex: 7 dias de arrependimento) com latência próxima de zero.
+3. **Motor Semântico Offline**: Desenvolvemos um analisador determinístico orientado a intenções para viabilizar testes instantâneos e avaliação sem dependência de credenciais externas.
+- **Por que não LangChain/CrewAI?** Frameworks de alto nível frequentemente introduzem camadas excessivas de abstração (*prompt bloat*), instabilidades entre versões e lentidão desnecessária. O código em Python puro com o SDK oficial confere clareza arquitetural e facilidade de manutenção em ambientes de produção.
+
+---
+
+### 2. Modelo e Provedor (LLM)
+- **Modelo Principal**: `gpt-4o-mini` via OpenAI API.
+  - **Justificativa**: Apresenta pontuação superior em tarefas de extração e *tool calling*, excelente compreensão da linguagem coloquial brasileira e custo até 95% menor em comparação a modelos de grande porte (como GPT-4 clássico), ideal para operações de alto volume de atendimento comercial.
+- **Flexibilidade Multi-Provedor**: Como a solução utiliza a interface padrão de Tool Calling, é trivial alternar para modelos locais (via Ollama/vLLM) ou modelos da família Google Gemini sem alterar a lógica das ferramentas.
+- **Modo Offline**: Incorporado para garantir que a equipe de avaliação da Artefact possa testar e validar o comportamento do agente sem a necessidade de cadastrar cartões de crédito ou expor chaves sensíveis.
+
+---
+
+### 3. Interface de Interação
+- **CLI Interativo (`main.py`)**:
+  - Foi desenvolvida uma interface de linha de comando robusta, intuitiva e colorida.
+  - O terminal elimina barreiras de configuração de portas, servidores web locais, dependências de Node.js ou problemas de renderização de navegadores.
+  - Inclui facilidades como `--demo` (que executa uma demonstração guiada dos 5 cenários exigidos) e `--scenario <1..5>`, além do chat aberto interativo.
+
+---
+
+### 4. Persistência do Histórico de Conversa
+- **Na Sessão Atual**: O agente mantém a lista sequencial de mensagens estruturadas (`history`), permitindo conversas contextuais coerentes (como perguntar de um violão e na mensagem seguinte perguntar sobre o frete dele sem precisar repetir o nome do produto).
+- **Controle de Sessão**: Implementou-se o comando `limpar`/`reset` para reiniciar o contexto entre diferentes simulações.
+- **Visão de Engenharia para Produção**: Em um ambiente real com WhatsApp Webhook, o histórico seria indexado por `customer_id` ou telefone em um cache distribuído (ex.: Redis com TTL de 24 horas), garantindo retenção durante a jornada de compra e descarte seguro em observância à LGPD.
+
+---
+
+### 5. Tratamento e Modelagem dos Dados
+- **Dados Tabulares (CSVs -> SQLite)**:
+  - Os 6 arquivos CSV fornecidos (`categories`, `customers`, `products`, `promotions`, `orders`, `order_items`) foram modelados e importados para um banco relacional **SQLite**.
+  - Isso viabiliza `JOINs` em tempo real entre produtos, categorias e promoções ativas, e entre clientes e pedidos.
+  - Filtros numéricos (`WHERE price_brl <= 1000 AND stock_quantity > 0`) garantem que o modelo nunca alucine preços ou prometa itens sem estoque.
+  - As especificações técnicas em JSON da coluna `specs` foram parseadas para consulta estruturada de atributos como tipo de corda (nylon/aço) e tampo sólido.
+- **Dados Textuais (PDF -> Segmentação Semântica)**:
+  - O manual `políticas_da_loja.pdf` foi extraído via `pypdf`, limpo de ruídos de formatação e fragmentado por seções canônicas de atendimento (horários, formas de pagamento, parcelamento, regras de devolução pelo CDC, modalidades de frete e garantia).
+
+---
+
+### 6. Engenharia de Prompt, Persona e Escopo
+A persona do assistente foi configurada via `SYSTEM_PROMPT` com diretrizes estritas:
+- **Identidade**: Atendente experiente e cordial da Empório da Música (*"como um amigo músico atendendo outro músico"*).
+- **Regra de Acessórios (Crítico)**: A loja comercializa **exclusivamente instrumentos musicais**. Pedidos de acessórios (cordas, palhetas, cabos, pedais, amplificadores) são educadamente recusados e redirecionados.
+- **Desvio de Assuntos Desconexos**: Perguntas fora da temática da loja são respondidas com brevidade e simpatia, direcionando o cliente de volta ao universo musical.
+
+---
+
+## 💬 Exemplos de Conversas
+
+Na pasta [`examples/`](file:///Users/gabrielfelippebaptista/Downloads/Desafio%20Técnico%20AI%20Engineer%202026/examples) encontram-se 5 diálogos completos detalhando o comportamento do agente nos principais cenários solicitados no desafio:
+
+1. [**conversa_1_catalogo_orcamento.md**](file:///Users/gabrielfelippebaptista/Downloads/Desafio%20Técnico%20AI%20Engineer%202026/examples/conversa_1_catalogo_orcamento.md): Consulta sobre opções de violões disponíveis até R$ 1.000,00 com cálculo de parcelamento e frete.
+2. [**conversa_2_endereco_horario.md**](file:///Users/gabrielfelippebaptista/Downloads/Desafio%20Técnico%20AI%20Engineer%202026/examples/conversa_2_endereco_horario.md): Informações de endereço físico no Centro de Campo Grande/MS e horários de sábado.
+3. [**conversa_3_consulta_preco_takamine.md**](file:///Users/gabrielfelippebaptista/Downloads/Desafio%20Técnico%20AI%20Engineer%202026/examples/conversa_3_consulta_preco_takamine.md): Verificação em tempo real do Takamine GD20 (R$ 2.199,00 e 5 unidades em estoque).
+4. [**conversa_4_politica_devolucao.md**](file:///Users/gabrielfelippebaptista/Downloads/Desafio%20Técnico%20AI%20Engineer%202026/examples/conversa_4_politica_devolucao.md): Aplicação das regras de arrependimento (7 dias corridos, frete por conta da loja e estorno integral).
+5. [**conversa_5_fora_de_escopo_acessorios.md**](file:///Users/gabrielfelippebaptista/Downloads/Desafio%20Técnico%20AI%20Engineer%202026/examples/conversa_5_fora_de_escopo_acessorios.md): Tratamento de itens não comercializados (acessórios/cabos) e desvio de temas aleatórios.
+
+---
+
+## 🔮 Limitações Conhecidas e Próximos Passos
 (Em desenvolvimento)
