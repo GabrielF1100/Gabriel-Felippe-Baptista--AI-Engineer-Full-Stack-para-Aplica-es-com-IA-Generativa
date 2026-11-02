@@ -46,3 +46,19 @@ def test_order_details(db_conn):
 def test_nonexistent_product(db_conn):
     prod = database.get_product_by_identifier("ProdutoInexistenteX999")
     assert prod is None
+
+
+def test_accent_insensitive_search(db_conn):
+    # Deve encontrar itens mesmo quando digitado sem acentos
+    res1 = database.search_products(category_name="violoes", query="nylon")
+    res2 = database.search_products(category_name="Violões", query="nylon")
+    assert len(res1) == len(res2)
+    assert len(res1) > 0
+
+
+def test_out_of_stock_filtering(db_conn):
+    all_items = database.search_products(category_name="Violões", only_in_stock=False, limit=50)
+    in_stock_items = database.search_products(category_name="Violões", only_in_stock=True, limit=50)
+    assert len(all_items) >= len(in_stock_items)
+    for p in in_stock_items:
+        assert p["stock_quantity"] > 0

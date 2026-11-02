@@ -31,3 +31,11 @@ def test_retrieve_shipping_rules():
     assert len(results) > 0
     combined = " ".join([r["content"] for r in results]).lower()
     assert "frete grátis" in combined or "500,00" in combined
+
+
+def test_retrieve_warranty_and_defects():
+    retriever = get_policy_retriever()
+    results = retriever.search_policies("Qual o prazo de garantia contra defeito de fabricação?")
+    assert len(results) > 0
+    combined = " ".join([r["content"] for r in results]).lower()
+    assert "garantia" in combined or "defeito" in combined
