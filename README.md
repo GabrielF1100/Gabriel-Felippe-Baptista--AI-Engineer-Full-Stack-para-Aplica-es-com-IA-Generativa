@@ -1,7 +1,7 @@
 # 🎶 Empório da Música — Agente Inteligente de Atendimento
 
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
-[![Tests](https://img.shields.io/badge/Tests-Pytest%2021%20Passed-brightgreen.svg)](https://pytest.org/)
+[![Tests](https://img.shields.io/badge/Tests-Pytest%2027%20Passed-brightgreen.svg)](https://pytest.org/)
 [![Architecture](https://img.shields.io/badge/Architecture-Tool%20Calling%20%2B%20RAG-orange.svg)]()
 [![Location](https://img.shields.io/badge/Empório%20da%20Música-Campo%20Grande%2FMS-yellow.svg)]()
 [![Author](https://img.shields.io/badge/Author-Gabriel%20Felippe%20Baptista-blueviolet.svg)]()
@@ -197,7 +197,7 @@ A suíte de testes cobre todas as camadas do sistema (banco de dados, extração
 ```bash
 pytest -v
 ```
-*Resultado: **21 testes automatizados passando com 100% de sucesso.***
+*Resultado: **27 testes automatizados passando com 100% de sucesso.***
 
 ---
 
@@ -324,7 +324,7 @@ Em total alinhamento com o que o enunciado da Artefact pontua sobre transparênc
 3. **Engenharia de Prompt e Refinamento de Persona**:
    - Otimização do `SYSTEM_PROMPT` com diretrizes claras de conduta (acolhimento musical, precisão matemática nos preços, transparência sobre estoque zerado e recusa elegante de assuntos desconexos).
 4. **Desenvolvimento Orientado a Testes (TDD)**:
-   - Construção guiada da suíte de testes com **Pytest** cobrindo 21 cenários de teste unitários e de integração, garantindo execução com 100% de sucesso.
+   - Construção guiada da suíte de testes com **Pytest** cobrindo 27 cenários de teste unitários e de integração, garantindo execução com 100% de sucesso.
 5. **Automação de Commits Progressivos**:
    - Organização do ciclo de commits atômicos no Git para representar a evolução cronológica natural do projeto.
 
