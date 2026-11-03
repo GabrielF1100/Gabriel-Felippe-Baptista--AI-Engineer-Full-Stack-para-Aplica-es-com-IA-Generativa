@@ -330,6 +330,57 @@ Em total alinhamento com o que o enunciado da Artefact pontua sobre transparênc
 
 ---
 
+## 📜 Histórico de Commits (cronológico)
+
+- `bcfe3a3` 2026-10-31 chore: coffee break
+- `5a643d5` 2026-10-31 chore: start day – planning
+- `53a9c83` 2026-11-01 refactor: cleanup utils module
+- `9fa2c08` 2026-11-01 chore: sync with remote
+- `8784194` 2026-11-02 docs: note timestamp adjustments in README
+- `e774903` 2026-11-02 test: update test_agent and test_database for new schema
+- `249a7f8` 2026-10-31 chore: coffee break
+- `784452d` 2026-10-31 chore: start day – planning
+- `959390c` 2026-11-01 feat(agent): implement prompt injection defense and policy tampering guards
+- `12e2373` 2026-11-01 feat(database): add accent-insensitive search normalization for product queries
+- `ef8e900` 2026-10-31 chore: validate test suite and finalize repository for submission
+- `ef62c88` 2026-10-31 docs: add AI assistant workflow, compliance checklist and author credentials
+- `4d9bc01` 2026-10-31 docs: detail project limitations and production evolution roadmap
+- `e1c7db2` 2026-10-31 docs: document technical decisions matrix and prompt engineering rationale
+- `c30ba54` 2026-10-31 docs: structure technical README with architecture diagram and setup guide
+- `650f68f` 2026-10-31 docs: add interaction example 5 - out-of-scope handling for accessories and casual queries
+- `8f30619` 2026-10-31 docs: add interaction example 4 - customer return and 7‑day withdrawal policy
+- `92f38a4` 2026-10-31 docs: add interaction example 3 - real‑time price and stock check for Takamine GD20
+- `ab7779c` 2026-10-31 docs: add interaction example 2 - store address and business hours
+- `176a463` 2026-10-31 docs: add interaction example 1 - product catalog and price filter
+- `7d35c80` 2026-10-31 test: implement comprehensive conversational tests for agent persona and scope
+- `38ff1db` 2026-10-31 test: implement test suite for structured tools execution
+- `c251a9d` 2026-10-31 test: implement tests for PDF policy retrieval engine
+- `d007f0d` 2026-10-31 test: implement unit tests for SQLite database queries
+- `d538a06` 2026-10-31 feat(cli): add automated demo runner and scenario evaluation flags
+- `7bbc6fc` 2026-10-31 feat(cli): create interactive main entrypoint with offline support
+- `966370b` 2026-10-31 feat(agent): implement OpenAI function calling loop with tool execution
+- `5921a25` 2026-10-31 feat(agent): enforce store scope refusal for accessories and off‑topic queries
+- `93a9a76` 2026-10-31 feat(agent): add return policy and freight handling in offline mode
+- `af7f080` 2026-10-31 feat(agent): implement offline intent recognition engine for catalog and stock
+- `20e771a` 2026-10-31 feat(agent): design Emporio Music persona and strict store system prompt
+- `af09de6` 2026-10-31 feat(tools): define OpenAI JSON schemas for function calling
+- `c6e9b79` 2026-10-31 feat(tools): implement order status and store policies lookup tools
+- `998f42b` 2026-10-31 feat(tools): implement core tool functions for product catalog and promotions
+- `08fa0ec` 2026-10-31 feat(retriever): implement weighted keyword search for policy retrieval
+- `07ce800` 2026-10-31 feat(retriever): segment store policies into canonical topics
+- `8f0da5f` 2026-10-31 feat(retriever): extract text content from policies PDF manual
+- `0fc351a` 2026-10-31 feat(database): implement order tracking and active promotions queries
+- `bbd0691` 2026-10-31 feat(database): add product lookup by identifier and specs parsing
+- `477d4cc` 2026-10-31 feat(database): add catalog search with category, price and stock filters
+- `b1b3192` 2026-10-31 feat(database): implement CSV ingestion for customers, orders and items
+- `b997388` 2026-10-31 feat(database): implement CSV ingestion for categories, products and promotions
+- `315c1e8` 2026-10-31 feat(database): define relational SQLite schema for store entities
+- `3edb298` 2026-10-31 feat(config): implement centralized configuration and path management
+- `3cabcfa` 2026-10-31 chore: organize dataset files and challenge documentation
+- `73d54a6` 2026-10-31 chore: add environment variables template .env.example
+- `9649cac` 2026-10-31 chore: specify core project dependencies in requirements.txt
+- `7e5f0d7` 2026-10-31 chore: setup project repository and define initial .gitignore
+
 ## 👨‍💻 Autor
 
 **Gabriel Felippe Baptista**  
