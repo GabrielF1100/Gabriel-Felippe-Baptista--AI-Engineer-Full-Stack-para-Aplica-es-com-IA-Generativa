@@ -30,13 +30,13 @@ DEMO_SCENARIOS = {
 
 def print_banner(offline: bool):
     print("=" * 68)
-    print("      🎶  EMPÓRIO DA MÚSICA — AGENTE VIRTUAL DE ATENDIMENTO  🎶")
-    print("               Campo Grande/MS • Fundada em 2008")
+    print("      EMPORIO DA MUSICA - AGENTE VIRTUAL DE ATENDIMENTO")
+    print("               Campo Grande/MS - Fundada em 2008")
     print("     Desenvolvido por: Gabriel Felippe Baptista (AI Engineer)")
     print("=" * 68)
     mode_str = "MODO OFFLINE (Sem custos de API / Regras locais)" if offline else f"MODO ONLINE (LLM: {config.OPENAI_MODEL})"
     print(f" Status: {mode_str}")
-    print(" Digite 'sair' ou 'exit' para encerrar | 'limpar' para reiniciar histórico")
+    print(" Digite 'sair' para encerrar | 'limpar' para reiniciar histórico")
     print("=" * 68 + "\n")
 
 
@@ -44,12 +44,12 @@ def run_demo(scenario_num: int = None, offline: bool = True):
     agent = EmporioMusicAgent(offline_mode=offline)
     scenarios = [DEMO_SCENARIOS[scenario_num]] if scenario_num in DEMO_SCENARIOS else DEMO_SCENARIOS.values()
 
-    print("\n--- INICIANDO DEMONSTRAÇÃO AUTOMATIZADA DOS CENÁRIOS ---\n")
+    print("\n--- DEMONSTRACAO DOS CENARIOS AVALIATIVOS ---\n")
     for s in scenarios:
-        print(f"\n▶ [{s['title']}]")
-        print(f"👤 Cliente: {s['question']}")
+        print(f"\n[{s['title']}]")
+        print(f"Cliente: {s['question']}")
         reply = agent.chat(s["question"])
-        print(f"🤖 Agente:\n{reply}\n")
+        print(f"Assistente:\n{reply}\n")
         print("-" * 68)
 
 
@@ -74,27 +74,27 @@ def main():
     print_banner(offline_mode)
     agent = EmporioMusicAgent(offline_mode=offline_mode)
 
-    print("🤖 Agente: Olá! Sou o assistente da Empório da Música. Como posso ajudar você hoje?")
+    print("Assistente: Ola! Sou o assistente de atendimento da Emporio da Musica. Como posso ajudar voce hoje?")
     while True:
         try:
-            user_msg = input("\n👤 Você: ").strip()
+            user_msg = input("\nCliente: ").strip()
             if not user_msg:
                 continue
 
             if user_msg.lower() in ("sair", "exit", "quit", "q"):
-                print("\n🤖 Agente: Muito obrigado pelo contato com a Empório da Música! Boas notas e até logo! 🎸\n")
+                print("\nAssistente: Muito obrigado pelo contato com a Emporio da Musica! Estamos sempre a disposicao e ate logo!\n")
                 break
 
             if user_msg.lower() in ("limpar", "clear", "reset"):
                 agent.reset_history()
-                print("\n[Histórico reiniciado com sucesso!]")
+                print("\n[Historico reiniciado com sucesso!]")
                 continue
 
             reply = agent.chat(user_msg)
-            print(f"\n🤖 Agente:\n{reply}")
+            print(f"\nAssistente:\n{reply}")
 
         except (KeyboardInterrupt, EOFError):
-            print("\n\nAtendimento finalizado. Até a próxima!")
+            print("\n\nAtendimento finalizado. Ate a proxima!")
             break
 
 

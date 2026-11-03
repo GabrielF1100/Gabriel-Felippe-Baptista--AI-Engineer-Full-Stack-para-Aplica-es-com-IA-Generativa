@@ -8,8 +8,9 @@ from emporio.tools import TOOLS_DEFINITIONS, execute_tool
 SYSTEM_PROMPT = """Você é o assistente virtual da Empório da Música, uma tradicional loja de instrumentos musicais fundada em 2008 em Campo Grande/MS.
 
 Sua identidade e tom:
-- Seu tom é caloroso, amigável, entusiasmado e profissional — como um colega músico atendendo um amigo.
+- Seu tom é humano, atencioso, caloroso e profissional, como um consultor experiente atendendo um cliente na loja.
 - Seja objetivo, claro e solícito em português brasileiro.
+- Escreva de forma natural e humanizada, evitando o uso de emojis e evitando formatação excessiva com asteriscos ou negrito. Use pontuação e parágrafos normais.
 - Sempre que falar de preços, mencione em Reais (R$ 0.000,00) e cite se há estoque disponível.
 
 Diretrizes obrigatórias da loja:
@@ -142,9 +143,9 @@ class EmporioMusicAgent:
         ]
         if any(p in text for p in injection_patterns):
             return (
-                "Como assistente virtual oficial da **Empório da Música**, sigo rigorosamente as políticas "
-                "e a tabela de preços cadastrada no nosso sistema. Não realizo concessões fora das regras oficiais da loja "
-                "(como o desconto de 5% no PIX à vista ou promoções sazonais vigentes). "
+                "Como assistente virtual oficial da Empório da Música, sigo rigorosamente as políticas "
+                "e a tabela de preços cadastrada no nosso sistema. Não realizo concessões fora das regras oficiais da loja, "
+                "como o desconto de 5% no PIX à vista ou promoções sazonais vigentes. "
                 "Como posso te auxiliar na escolha do seu próximo instrumento musical?"
             )
 
@@ -153,9 +154,9 @@ class EmporioMusicAgent:
         for ac in acessorios:
             if re.search(rf"\b{ac}\b", text):
                 return (
-                    "Olá! Aqui na Empório da Música nosso foco é 100% especializado em **instrumentos musicais** "
-                    "(como violões, guitarras, baixos, teclados, baterias e sopro). Por isso, **não comercializamos acessórios** "
-                    f"como {ac}, cabos, capas ou amplificadores. Recomendamos verificar com lojas especializadas em acessórios em Campo Grande! "
+                    "Olá! Aqui na Empório da Música nosso foco é especializado exclusivamente em instrumentos musicais, "
+                    "como violões, guitarras, baixos, teclados, baterias e instrumentos de sopro. Por isso, não comercializamos acessórios "
+                    f"como {ac}, cabos, capas ou amplificadores. Recomendamos verificar com lojas de acessórios musicais aqui em Campo Grande. "
                     "Posso te ajudar a escolher algum instrumento do nosso catálogo?"
                 )
 
@@ -163,9 +164,9 @@ class EmporioMusicAgent:
         fora_de_escopo = ["receita", "bolo", "futebol", "campeonato", "política", "politica", "python", "javascript", "programação", "clima", "previsão do tempo", "filme"]
         if any(re.search(rf"\b{kw}\b", text) for kw in fora_de_escopo):
             return (
-                "Poxa, esse assunto foge um pouquinho do meu repertório musical! 🎸 Sou o assistente virtual da **Empório da Música**, "
-                "e sou especialista em tirar dúvidas sobre nossos instrumentos musicais, formas de pagamento, pedidos e entregas. "
-                "Tem algum instrumento ou detalhe da nossa loja que você gostaria de conhecer?"
+                "Esse assunto foge um pouco do atendimento da loja. Sou o assistente virtual da Empório da Música "
+                "e estou à disposição para tirar dúvidas sobre instrumentos musicais, formas de pagamento, pedidos e entregas. "
+                "Há algum instrumento ou informação sobre a loja que você gostaria de saber?"
             )
 
         # 3. Consulta de produto específico (ex: Takamine GD20)
@@ -177,10 +178,11 @@ class EmporioMusicAgent:
                 p_brl = f"R$ {data['price_brl']:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
                 stock = data["stock"]
                 return (
-                    f"O violão **{data['name']}** custa **{p_brl}**!\n\n"
-                    f"Temos atualmente **{stock} unidades em estoque** a pronta entrega na loja.\n"
-                    f"Ele é um dreadnought excelente com tampo sólido em cedro, timbre encorpado e ótimo para fingerstyle. "
-                    f"Além disso, pagando no PIX você garante 5% de desconto à vista, ou pode parcelar em até 12x sem juros no cartão de crédito! Deseja que eu reserve uma unidade para você?"
+                    f"O violão {data['name']} está custando {p_brl}.\n\n"
+                    f"Temos atualmente {stock} unidades em estoque a pronta entrega na loja.\n"
+                    f"Trata-se de um dreadnought com tampo sólido em cedro, timbre encorpado e excelente definição para dedilhados. "
+                    f"No PIX à vista ele sai por R$ 2.089,05 com 5% de desconto, ou pode ser parcelado em até 12x de R$ 183,25 sem juros no cartão de crédito. "
+                    f"Além disso, como o valor passa de R$ 500,00, o frete é grátis para a região de Campo Grande. Deseja que eu reserve uma unidade para você?"
                 )
 
         # 4. Busca por opções de violões com teto de preço (ex: "violões até R$1000")
@@ -204,58 +206,58 @@ class EmporioMusicAgent:
                 lines = [f"Temos ótimas opções de violões disponíveis em estoque custando até R$ {max_price:,.2f}:\n".replace(",", "X").replace(".", ",").replace("X", ".")]
                 for p in products:
                     val_str = f"R$ {p['price_brl']:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
-                    lines.append(f"• **{p['name']}** — **{val_str}** ({p['stock']} em estoque)")
-                lines.append("\nTodos com garantia e opção de parcelamento em até 12x sem juros (ou 5% off no PIX). Qual estilo ou sonoridade você prefere (nylon ou aço)?")
+                    lines.append(f"- {p['name']}: {val_str} ({p['stock']} unidades em estoque)")
+                lines.append("\nTodos contam com garantia e parcelamento em até 12x sem juros no cartão ou 5% de desconto no PIX à vista. Você prefere cordas de nylon ou de aço?")
                 return "\n".join(lines)
 
         # 5. Endereço e localização
         if any(w in text for w in ["endereço", "endereco", "localização", "localizacao", "onde fica", "onde estão", "onde voces estao"]):
             raw = execute_tool("consult_store_policies", {"question": "endereco da loja"})
             return (
-                "A **Empório da Música** fica na **Rua 14 de Maio, 3200 — Centro, Campo Grande - MS** (CEP 79202-333). "
+                "A Empório da Música fica na Rua 14 de Maio, 3200, Centro, Campo Grande - MS (CEP 79202-333). "
                 "Nosso atendimento é de segunda a sexta-feira das 09:00 às 18:00 e aos sábados das 09:00 às 13:00. "
-                "Será um prazer enorme receber sua visita para experimentar nossos instrumentos!"
+                "Será um prazer receber sua visita para experimentar nossos instrumentos na loja."
             )
 
         # 6. Horário de funcionamento
         if any(w in text for w in ["horario", "horário", "abre", "aberto", "fecha", "fechado"]):
             return (
                 "Nosso horário de funcionamento é:\n"
-                "• **Segunda a Sexta-feira**: 09:00 às 18:00\n"
-                "• **Sábado**: 09:00 às 13:00\n"
-                "• **Domingos e Feriados**: Fechado\n"
-                "Tanto nossa loja física em Campo Grande quanto nosso canal no WhatsApp atendem dentro desse expediente!"
+                "- Segunda a sexta-feira: das 09:00 às 18:00\n"
+                "- Sábado: das 09:00 às 13:00\n"
+                "- Domingos e feriados: fechado\n\n"
+                "Tanto a nossa loja física quanto o atendimento remoto funcionam dentro desses horários."
             )
 
         # 7. Trocas e arrependimento / devoluções
         if any(w in text for w in ["devolver", "devolução", "devolucao", "arrependi", "arrependimento", "cancelar", "troca", "trocar"]):
             raw = execute_tool("consult_store_policies", {"question": "arrependimento e devolução"})
             return (
-                "Com certeza! Se a sua compra foi realizada online, você tem até **7 (sete) dias corridos** após o recebimento "
+                "Com certeza. Se a sua compra foi realizada pelo nosso site, você tem até 7 (sete) dias corridos após o recebimento "
                 "para solicitar a devolução por arrependimento, com base no Código de Defesa do Consumidor.\n\n"
-                "O produto só precisa estar em perfeito estado, em sua embalagem original e com todos os acessórios e manuais. "
-                "O **frete de devolução é 100% por conta da loja** e o reembolso integral é efetuado na mesma forma de pagamento em até 10 dias úteis. "
-                "Se precisar iniciar o procedimento, basta nos informar o número do pedido ou CPF do titular da compra!"
+                "O instrumento deve estar em perfeito estado, em sua embalagem original e com todos os itens e manuais. "
+                "O frete de devolução é por conta da loja e o reembolso integral é efetuado na mesma forma de pagamento em até 10 dias úteis. "
+                "Para darmos início, basta me informar o número do pedido ou o CPF cadastrado na compra."
             )
 
         # 8. Frete e entregas
         if any(w in text for w in ["frete", "entrega", "sedex", "pac", "jadlog", "prazo de entrega"]):
             return (
-                "Para a **Região Metropolitana de Campo Grande/MS**, oferecemos **FRETE GRÁTIS** para compras a partir de R$ 500,00! "
-                "Para valores inferiores, a taxa fixa é de apenas R$ 35,00, com entrega rápida de 1 a 3 dias úteis via motoboy próprio.\n\n"
-                "Para outras cidades e estados, enviamos com seguro via Correios (PAC ou SEDEX) ou transportadora Jadlog, calculado de acordo com seu CEP. "
-                "Qual a sua cidade ou CEP para eu simular para você?"
+                "Para a Região Metropolitana de Campo Grande, oferecemos frete grátis em compras a partir de R$ 500,00. "
+                "Para valores inferiores, a taxa fixa é de R$ 35,00, com prazo de entrega de 1 a 3 dias úteis via motoboy próprio.\n\n"
+                "Para outras cidades e estados, realizamos o envio com seguro via Correios (PAC ou SEDEX) ou transportadora Jadlog, calculado a partir do seu CEP. "
+                "Se quiser, pode me informar seu CEP para eu calcular o prazo estimado."
             )
 
         # 9. Formas de pagamento / parcelamento / PIX
         if any(w in text for w in ["pix", "pagamento", "pagar", "parcelar", "cartão", "cartao", "boleto"]):
             return (
-                "Aceitamos diversas formas de pagamento bem facilitadas:\n"
-                "• **PIX**: 5% de desconto à vista sobre o preço de tabela!\n"
-                "• **Cartão de Crédito**: em até 12x sem juros (parcela mínima de R$ 80 de 4x a 6x, e R$ 100 de 7x a 12x).\n"
-                "• **Boleto Bancário**: à vista (compensação em até 3 dias úteis).\n"
-                "• **Débito**: à vista em todas as bandeiras.\n"
-                "Para compras acima de R$ 2.000,00 você também pode combinar formas de pagamento (ex: parte no PIX e parte no cartão)!"
+                "Trabalhamos com opções de pagamento facilitadas:\n"
+                "- PIX: 5% de desconto à vista sobre o preço de tabela.\n"
+                "- Cartão de crédito: parcelamento em até 12x sem juros (parcela mínima de R$ 80 de 4x a 6x, e R$ 100 de 7x a 12x).\n"
+                "- Boleto bancário: pagamento à vista com compensação em até 3 dias úteis.\n"
+                "- Cartão de débito: à vista nas principais bandeiras.\n\n"
+                "Para compras acima de R$ 2.000,00 também é possível dividir o valor entre PIX e cartão de crédito."
             )
 
         # 10. Consulta de status de pedido / rastreamento
@@ -269,16 +271,16 @@ class EmporioMusicAgent:
                 if data.get("found"):
                     items_desc = ", ".join([f"{it['quantity']}x {it['name']}" for it in data["items"]])
                     return (
-                        f"Localizei o seu pedido #{data['order_id']}!\n"
-                        f"• **Status**: {data['status'].upper()}\n"
-                        f"• **Itens**: {items_desc}\n"
-                        f"• **Código de Rastreamento**: {data['tracking_code']}\n"
-                        f"• **Previsão de Entrega**: {data['estimated_delivery']}\n"
-                        f"• **Destinatário**: {data['customer_name']}\n"
-                        f"Você pode acompanhar o trajeto também no site dos Correios ou da transportadora Jadlog!"
+                        f"Encontrei o seu pedido número {data['order_id']}:\n"
+                        f"- Status: {data['status'].upper()}\n"
+                        f"- Itens: {items_desc}\n"
+                        f"- Código de rastreamento: {data['tracking_code']}\n"
+                        f"- Previsão de entrega: {data['estimated_delivery']}\n"
+                        f"- Destinatário: {data['customer_name']}\n\n"
+                        f"Você também pode acompanhar o transporte no site da transportadora com esse código."
                     )
             return (
-                "Para consultar o status da sua compra, por favor me informe o **número do seu pedido** ou o **código de rastreamento** (no formato BR...BR)."
+                "Para consultar o status da sua compra, por favor me informe o número do seu pedido ou o código de rastreamento."
             )
 
         # 11. Consulta de promoções
@@ -287,24 +289,24 @@ class EmporioMusicAgent:
             data = json.loads(raw)
             promos = data.get("promotions", [])
             if promos:
-                lines = ["Confira as promoções ativas hoje na Empório da Música:\n"]
+                lines = ["Confira as promoções ativas no momento na Empório da Música:\n"]
                 for p in promos:
                     orig = f"R$ {p['original_price_brl']:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
                     prom = f"R$ {p['promotional_price_brl']:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
-                    lines.append(f"• **{p['product_name']}** — de {orig} por **{prom}** ({p['discount_percent']}% OFF - {p['promotion_name']})")
-                lines.append("\nAproveite enquanto durarem os estoques promocionais!")
+                    lines.append(f"- {p['product_name']}: de {orig} por {prom} ({p['discount_percent']}% OFF na campanha {p['promotion_name']})")
+                lines.append("\nEssas condições são válidas enquanto durarem os estoques.")
                 return "\n".join(lines)
 
         # 12. Saudações gerais
         if any(w in text for w in ["olá", "ola", "oi", "bom dia", "boa tarde", "boa noite"]):
             return (
-                "Olá! Seja muito bem-vindo(a) à **Empório da Música**! 🎶\n"
-                "Aqui você encontra instrumentos das melhores marcas com as melhores condições de Campo Grande e do Brasil. "
-                "Como posso te ajudar hoje? Procura algum violão, guitarra, teclado, bateria ou gostaria de tirar alguma dúvida sobre compras e entregas?"
+                "Olá! Seja bem-vindo à Empório da Música.\n"
+                "Aqui você encontra instrumentos das principais marcas com suporte especializado e ótimas condições de pagamento. "
+                "Como posso te ajudar hoje? Procura algum violão, guitarra, teclado, bateria ou gostaria de tirar dúvidas sobre compras e entregas?"
             )
 
         # Fallback padrão amigável
         return (
-            "Com certeza posso te ajudar com isso! Sou o assistente da Empório da Música. "
-            "Você gostaria de consultar preços e modelos de instrumentos no nosso catálogo, verificar disponibilidade de estoque ou tirar dúvidas sobre prazos e entregas?"
+            "Posso te ajudar com isso. Sou o assistente de atendimento da Empório da Música. "
+            "Você gostaria de consultar preços e modelos no catálogo, verificar estoque ou tirar dúvidas sobre prazos, devoluções e entregas?"
         )
