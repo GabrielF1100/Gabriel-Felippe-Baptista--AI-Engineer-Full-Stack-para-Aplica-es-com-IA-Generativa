@@ -8,7 +8,7 @@
 ### Diálogo
 
 **Cliente**:
-> Olá! Gostaria de começar a tocar e queria saber quais opções de violões disponíveis vocês têm custando até R$1000?
+> Olá! Gostaria de começar a tocar e queria saber quais opções de violões disponíveis vocês têm custando até R$1000? Vocês oferecem desconto no PIX ou parcelamento no cartão sem juros?
 
 **Agente (Empório da Música)**:
 > Olá! Seja muito bem-vindo à Empório da Música! 🎶 É uma satisfação imensa te ajudar a dar os primeiros passos na música!
@@ -30,9 +30,26 @@
 > • **Yamaha C40 Nylon Natural** — **R$ 599,90** (12 unidades em estoque)  
 > *Um dos violões clássicos mais recomendados por professores no mundo todo pelo equilíbrio e durabilidade.*
 >
-> Além disso, você tem **5% de desconto à vista pagando no PIX** ou pode parcelar em **até 12x sem juros no cartão de crédito**. E se você estiver na região metropolitana de Campo Grande e fechar um pedido acima de R$ 500,00, o frete é grátis via motoboy próprio!
+> **Condições de Pagamento e Descontos**:
+> • **À vista no PIX**: você ganha **5% de desconto** imediato em qualquer um deles! (Por exemplo, o Yamaha C40 sai de R$ 599,90 por **R$ 569,90**).
+> • **Cartão de Crédito**: parcelamos em **até 12x sem juros** (o Tagima Memphis, por exemplo, fica em 12x de apenas **R$ 35,82**).
+> • **Frete**: nas compras a partir de R$ 500,00, a entrega é **grátis** na região de Campo Grande via motoboy próprio!
 >
 > Você tem preferência por cordas de **nylon** (mais macias para dedos) ou cordas de **aço** (som mais encorpado e brilhante)?
+
+**Cliente**:
+> Gostei muito do Yamaha C40! Como ficaria o parcelamento dele em 6x e em 12x no cartão de crédito?
+
+**Agente (Empório da Música)**:
+> Excelente escolha! O Yamaha C40 é uma referência mundial para estudantes e músicos amadores exigentes.
+>
+> As condições de parcelamento para o **Yamaha C40 (R$ 599,90)** no cartão de crédito são:
+> • **Em 6x sem juros**: parcelas de **R$ 99,98**
+> • **Em 12x sem juros**: parcelas de **R$ 49,99**
+>
+> Lembrando que se optar pelo **PIX à vista**, com os nossos 5% de desconto ele fica por **R$ 569,90** (economia de R$ 30,00). E como o valor supera R$ 500,00, o frete via motoboy aqui em Campo Grande é **100% gratuito**!
+>
+> Posso preparar a reserva de uma unidade para você?
 
 ---
 
