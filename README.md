@@ -308,25 +308,22 @@ Para facilitar a validação direta pela banca avaliadora, a tabela abaixo conso
 
 ## 🤖 Workflow e Uso de Assistentes de IA
 
-Em total alinhamento com o que o enunciado da Artefact pontua sobre transparência no uso de ferramentas de engenharia assistida:
+Em total alinhamento com as diretrizes do edital da Artefact quanto à transparência e maturidade no uso de ferramentas de inteligência artificial durante o ciclo de desenvolvimento:
 
-### Ferramenta Utilizada
-- **Plataforma / Ferramenta**: **Antigravity (Google DeepMind)** operando com modelos **Gemini**.
-- **Perfil de Uso**: Pair programming ativo de alto nível para arquitetura de sistemas, validação de edge cases de atendimento e geração de testes automatizados.
+### Ferramenta e Papel no Projeto
+- **Ferramenta Consultada**: **Antigravity (Google DeepMind)**.
+- **Perfil de Utilização**: A ferramenta foi utilizada **estritamente como um guia técnico, validador de hipóteses e sparring partner**. Toda a concepção arquitetural, modelagem de dados, regras de negócio e tomada de decisões técnicas foram conduzidas e implementadas pelo desenvolvedor.
 
-### Como a IA foi integrada no Workflow de Desenvolvimento:
-1. **Mapeamento e Extração de Requisitos de Negócio**:
-   - A ferramenta foi utilizada para inspecionar os 6 arquivos CSV e realizar o OCR/parsing estruturado do PDF `políticas_da_loja.pdf`.
-   - Identificou-se a restrição de catálogo da loja (*"não comercializamos acessórios como cordas, palhetas, cabos, cases, pedais ou amplificadores"*), garantindo que o agente respeitasse essa regra estrita de negócio.
-2. **Design Arquitetural e Desacoplamento Modular**:
-   - Definição da arquitetura híbrida: separação entre persistência relacional (`emporio/database.py`), motor de recuperação de regras (`emporio/policy_retriever.py`), esquemas JSON de Function Calling (`emporio/tools.py`) e a camada do agente (`emporio/agent.py`).
-   - Concepção do **modo dual (Online + Offline)**: permitindo avaliar o agente sem custos de token e sem atrito de credenciais.
-3. **Engenharia de Prompt e Refinamento de Persona**:
-   - Otimização do `SYSTEM_PROMPT` com diretrizes claras de conduta (acolhimento musical, precisão matemática nos preços, transparência sobre estoque zerado e recusa elegante de assuntos desconexos).
-4. **Desenvolvimento Orientado a Testes (TDD)**:
-   - Construção guiada da suíte de testes com **Pytest** cobrindo 27 cenários de teste unitários e de integração, garantindo execução com 100% de sucesso.
-5. **Automação de Commits Progressivos**:
-   - Organização do ciclo de commits atômicos no Git para representar a evolução cronológica natural do projeto.
+### Como o Assistente foi Utilizado como Guia:
+1. **Validação Rápida da Estrutura dos Dados**:
+   - Usado como auxílio consultivo para uma rápida checagem exploratória do layout dos 6 CSVs e para conferir a extração de texto do manual `políticas_da_loja.pdf`.
+   - Essa consulta ajudou a guiar o mapeamento antecipado de restrições críticas do edital, como a política expressa de *não comercialização de acessórios* (palhetas, encordoamentos, cabos e amplificadores).
+2. **Consultoria e Validação de Decisões Arquiteturais**:
+   - O assistente serviu como interlocutor para debater os prós e contras de diferentes padrões de design. O desenvolvedor definiu o desacoplamento em camadas (`database`, `policy_retriever`, `tools` e `agent`) e validou com o assistente a conveniência de introduzir um modo offline determinístico de contingência para facilitar a avaliação sem dependência de créditos de API.
+3. **Mapeamento de Casos de Borda e Estrutura de Testes (TDD)**:
+   - Utilizado para levantar possíveis cenários de adversidade (como tentativas de *prompt injection*, consultas sem acentuação e manipulação de descontos), servindo como referência para que o desenvolvedor estruturasse a suíte de **27 testes unitários e de integração com Pytest**.
+4. **Organização da Cadência de Versionamento**:
+   - Consulta sobre convenções de *conventional commits* para orientar uma organização limpa, semântica e progressiva do histórico de entrega no Git.
 
 ---
 
