@@ -322,8 +322,8 @@ Em total alinhamento com as diretrizes do edital da Artefact quanto à transpar�
    - O assistente serviu como interlocutor para debater os prós e contras de diferentes padrões de design. O desenvolvedor definiu o desacoplamento em camadas (`database`, `policy_retriever`, `tools` e `agent`) e validou com o assistente a conveniência de introduzir um modo offline determinístico de contingência para facilitar a avaliação sem dependência de créditos de API.
 3. **Mapeamento de Casos de Borda e Estrutura de Testes (TDD)**:
    - Utilizado para levantar possíveis cenários de adversidade (como tentativas de *prompt injection*, consultas sem acentuação e manipulação de descontos), servindo como referência para que o desenvolvedor estruturasse a suíte de **27 testes unitários e de integração com Pytest**.
-4. **Organização da Cadência de Versionamento**:
-   - Consulta sobre convenções de *conventional commits* para orientar uma organização limpa, semântica e progressiva do histórico de entrega no Git.
+4. **Validação da Tolerância a Falhas e Resiliência**:
+   - Usado como contraponto crítico para avaliar cenários de indisponibilidade de rede ou esgotamento de quota de API externa, orientando a implementação de uma camada robusta de tratamento de exceções e fallback determinístico.
 
 ---
 
